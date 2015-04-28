@@ -35,12 +35,12 @@ def combinations(seq, m):
     N = len(seq)
     subcons = [((), -1)]
     for x in seq: 
+        if m == 0: break
+        else: m -= 1
         nps = []
         for subcomb, i in subcons:
             for j in range(i+1, N): # choose one from rest
                 nps.append((subcomb + (seq[j],), j))
-        if m == 0: break
-        else: m -= 1
         subcons = nps
     for c, _ in subcons:
         yield c
@@ -50,27 +50,26 @@ def enum_two(seq):
 
 def split_with(seq, slti):
     """ `slti' is a sequence of indices, which is intended to be
-    indices of the sequence of slots inbetween (no side slots)
+    indices of the slots inbetween (no side slots)
     and split sequence `seq' into len(slti)+1 subsequences.
-    E.g. [a,b,c,d,e], which is [a _0_ b _1_ c _2_ d _3_ e] with
-    slots (0, 1, 2, 3), then some slti (1, 3) splits it into:
+    E.g. [a,b,c,d,e], which is [a 0 b 1 c 2 d 3 e] with
+    slots (0, 1, 2, 3), then the slti (1, 3) splits it into:
     [ [a,b], [c,d], [e] ]
     """
     if len(slti) == 0:
         yield seq[:]
     else:
-        yield seq[:slti[0]+1] 		# seg-len: slti[0]+1
+        yield seq[:slti[0]+1]   # seg-len: slti[0]+1
         for x, y in enum_two(slti):
-            yield seq[x+1:y+1] 		# seg-len: y - x
-        yield seq[slti[-1]+1:]		# seg-len: N - slti[-1] (seq[z:] == seq[z:N+1])
+            yield seq[x+1:y+1]  # seg-len: y - x
+        yield seq[slti[-1]+1:] # seg-len: N - slti[-1] - 1 (seq[j:] == seq[j:N])
 
 def partition(seq):
+    """ Find all possible partitions of given sequence. """
     if len(seq) == 1:
-        # [ a ] -> [ [a] ]
         yield [seq]
     else:
-        # [ a ] -> [ [a,b], [c,d,e], ... ]
-        # slots: [0 .. n-2]:: [ a _0_ b _1_ c _2_ d ... ]
+        # slots: [0 .. n-2] :: [ a 0 b 1 c 2 d ... ]
         slots = list(range(len(seq)-1)) 
         # Use each subset of slots to partit the sequence.
         # There're n-1 slots, thus 2**(n-1) slot-subsets. 
@@ -78,6 +77,7 @@ def partition(seq):
             yield list(split_with(seq, s))
 
 def merge(seq_segs, partit):
+    """ Merge segments of a sequence and partitions inbetween. """
     seqn = []
     for s, p in zip(seq_segs, partit + [[]]): 
         seqn.extend(s)
@@ -85,14 +85,16 @@ def merge(seq_segs, partit):
     return seqn
 
 def sepr_seq(seq, sgr):
-    # The slot group `sgr' are considered to include side slots.
-    # [ _0_ a0 _1_ a1 ... aN-1 _N_ ] i.e. ay is right of y (y is slot number)
+    """ The slot group `sgr' are considered to include side slots, like
+     [ 0 a 1 b .. z N ].
+    """
     yield seq[:sgr[0]]
     for x, y in enum_two(sgr):
         yield seq[x:y]
     yield seq[sgr[-1]:]
 
 def counter_sorted(seq):
+    """ Count duplicated elements in sorted sequence. """
     recs = []
     i = 0
     while i < len(seq):
@@ -107,16 +109,17 @@ def counter_sorted(seq):
     return recs 
 
 def perm_uniq(seq):
+    """ All in one. """
     seq = sorted(seq)
     que = counter_sorted(seq)
     x, n = que.pop(0)
     perms = [ [x]*n ]
     for x, n in que:
         nperms = []
-        for partit in partition([x] * n):
-            for perm in perms:
+        for perm in perms:
+            for partit in partition([x] * n):
                 for sltgrp in combinations(tuple(range(len(perm)+1)),
-                                           len(partit)): # partit is list
+                                           len(partit)):
                     nperms.append(merge(sepr_seq(perm, sltgrp),
                                         partit))
         perms = nperms
