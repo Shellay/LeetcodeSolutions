@@ -47,22 +47,10 @@
 #     then remember this path to (x, y);
 #   - Go on; 
 
-inp = [
-    [  -2,  -3,   3],
-    [  -5, -10,   1],
-    [  10,  30,  -5],
-]
-
-inp1 = [
-    [  -2,  -3,   3, -20],
-    [  -5, -10,   1, -10],
-    [  10,  30,  -5,   9],
-]
-
 def opt_path(inp):
     """ Mind we are tracing the prince's health along the way and
-    guarding his life, not waiting until the resulting health at
-    the end.......
+    guarding his life, not only waiting to see the final health.......
+
     *. Accumulate active health along each path with accu[][]
     *. Trace the lowest health along each path with low[][]
       -> Update the entry low[r][c] each time when accumulated
@@ -99,3 +87,21 @@ def opt_path(inp):
                 low [r][c] = min(low[r-1][c], accu[r][c])
                 path[r][c] = path[r-1][c] + ' DOWN'
     return path[-1][-1] 
+
+# Basic test:
+
+inp = [
+    [  -2,  -3,   3],
+    [  -5, -10,   1],
+    [  10,  30,  -5],
+]
+opt_path(inp)
+# 'START RIGHT RIGHT DOWN DOWN'
+
+inp1 = [
+    [  -2,  -3,   3, -20],
+    [  -5, -10,   1,   0],
+    [  10,  30,  -5,   9],
+]
+opt_path(inp1)
+# 'START RIGHT RIGHT DOWN RIGHT DOWN'
