@@ -29,11 +29,11 @@
 # Implemetation details:
 # - These mentioned above can be done in one pass;
 # - Find turning points pairwise incrementally to determine the
-#   segments inbetween based upon given rating-values;
-# - During the iteration, the last turning point of zigzag line
-#   is rememberd, hence if we arrives at a new turning point,
-#   the candies for children between the two turning points
-#   are incrementally assigned.
+#   segments inbetween with respect to the rating-values;
+# - During the iteration, the previous turning point of zigzag line
+#   is remembered, hence if we arrives at a new turning point,
+#   the candies for children between these two turning points
+#   are then incrementally assigned.
 
 def candies(seq):
     N = len(seq)
@@ -60,8 +60,14 @@ def candies(seq):
                 prv = i
     return cand
 
-seqc = [10, 11, 14,  9, 18, 13, 10,  5, 12, 15]
-seqd = [14, 10,  5,  2,  3,  6,  7,  9,  8,  6]
+# Basic test
+children1 = [10, 11, 14,  9, 18, 13, 10,  5, 12, 15]
+children2 = [14, 10,  5,  2,  3,  6,  7,  9,  8,  6]
+children3 = [ 0,  0,  3,  3,  5,  5,  4,  0,  2,  2]
 
-c = candies(seqc)
-d = candies(seqd)
+candies(children1)
+# [1, 2, 3, 1, 4, 3, 2, 1, 2, 3]
+candies(children2)
+# [4, 3, 2, 1, 2, 3, 4, 5, 2, 1]
+candies(children3)
+# [1, 1, 2, 2, 3, 3, 2, 1, 2, 2]
