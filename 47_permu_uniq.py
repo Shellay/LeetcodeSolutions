@@ -24,12 +24,13 @@ def subsets(seq):
         yield from nps
         subseqs.extend(nps) 
 
-# def comb(seq, m):
-#     if m == 0: yield ()
-#     elif m == len(seq): yield tuple(seq)
-#     else:
-#         yield from ((seq[0],) + _ for _ in comb(seq[1:], m-1))
-#         yield from comb(seq[1:], m)
+# C(n, m) == C(n-1, m-1) + C(n-1, m)
+def comb(seq, m):
+    if m == 0: yield ()
+    elif m == len(seq): yield tuple(seq)
+    else:
+        yield from ((seq[0],) + _ for _ in comb(seq[1:], m-1))
+        yield from comb(seq[1:], m)
 
 def combinations(seq, m): 
     N = len(seq)
